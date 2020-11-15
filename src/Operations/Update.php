@@ -10,12 +10,14 @@ trait Update
 
     public function update(int $id, array $data)
     {
-        $data = $this->parsePayload($data);
+        $data = $this->objectToPayload($data);
 
-        return $this->client->put(
+        $response = $this->client->put(
             $this->path($id),
             $data
         );
+
+        return $this->payloadToObject($response);
     }
 
 }

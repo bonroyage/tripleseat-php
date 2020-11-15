@@ -11,12 +11,7 @@ use Tripleseat\Operations;
 class Site extends Service
 {
     public const PATH = "sites";
+    public const OBJECT_KEY = "site";
 
     use Operations\All;
-
-    protected function parseFromList(array $value)
-    {
-        return $value['site'];
-    }
-
 }

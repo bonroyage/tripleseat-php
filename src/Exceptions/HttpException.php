@@ -1,6 +1,8 @@
 <?php namespace Tripleseat\Exceptions;
 
-class HttpException extends \Exception implements TripleseatException
+use Exception;
+
+class HttpException extends Exception implements TripleseatException
 {
 
     public $httpStatus = 0;
@@ -18,8 +20,10 @@ class HttpException extends \Exception implements TripleseatException
 
     public function getMessageFromHttpBody()
     {
-        if (\is_array($this->httpBody) && \array_key_exists('text', $this->httpBody)) {
+        if (is_array($this->httpBody) && array_key_exists('text', $this->httpBody)) {
             return $this->httpBody['text'];
+        } elseif (is_array($this->httpBody)) {
+            return json_encode($this->httpBody);
         }
 
         return $this->httpBody;

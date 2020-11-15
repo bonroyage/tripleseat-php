@@ -11,6 +11,7 @@ use Tripleseat\Operations;
 class Booking extends Service
 {
     public const PATH = "bookings";
+    public const OBJECT_KEY = "booking";
 
     use Operations\AllPaged;
     use Operations\SearchPaged;
@@ -18,13 +19,4 @@ class Booking extends Service
     use Operations\Create;
     use Operations\Update;
     use Operations\Delete;
-
-    protected function parsePayload(array $data): array
-    {
-        if (array_key_exists('booking', $data)) {
-            return $data;
-        }
-
-        return ['booking' => $data];
-    }
 }

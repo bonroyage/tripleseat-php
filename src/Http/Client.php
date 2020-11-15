@@ -4,6 +4,7 @@ use ApiClients\Tools\Psr7\Oauth1\Definition\ConsumerKey;
 use ApiClients\Tools\Psr7\Oauth1\Definition\ConsumerSecret;
 use ApiClients\Tools\Psr7\Oauth1\RequestSigning\RequestSigner;
 use ApiClients\Tools\Psr7\Oauth1\Signature\HmacSha1Signature;
+use Generator;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -49,6 +50,11 @@ class Client implements Http
     private $requestSigner;
 
     /**
+     * @var array
+     */
+    private $auth;
+
+    /**
      * Client constructor.
      *
      * @param array $auth
@@ -56,6 +62,7 @@ class Client implements Http
      */
     public function __construct(array $auth = [], ClientInterface $httpClient = null)
     {
+        $this->auth = $auth;
         $this->baseUrl = 'https://api.tripleseat.com/v1/';
 
         $this->http = $httpClient ?? Psr18ClientDiscovery::find();
@@ -74,7 +81,7 @@ class Client implements Http
         ]);
     }
 
-    public function getPaged(string $path, array $query = [], int $fromPage = 1, int $untilPage = PHP_INT_MAX): \Generator
+    public function getPaged(string $path, array $query = [], int $fromPage = 1, int $untilPage = PHP_INT_MAX): Generator
     {
         // Initial page number cannot be less than 1
         $fromPage = max(1, $fromPage);
@@ -167,7 +174,7 @@ class Client implements Http
 
     /**
      * @param string $path
-     * @param null $body
+     * @param mixed $body
      * @param array $query
      *
      * @return mixed
@@ -185,7 +192,7 @@ class Client implements Http
 
     /**
      * @param string $path
-     * @param null $body
+     * @param mixed $body
      * @param array $query
      *
      * @return mixed
@@ -215,6 +222,19 @@ class Client implements Http
         $request = $this->createRequest('DELETE', $path, $query);
 
         return $this->execute($request);
+    }
+
+    /**
+     * @param string|null $key
+     * @return array|string|null
+     */
+    public function getAuth(string $key = null)
+    {
+        if (is_null($key)) {
+            return $this->auth;
+        }
+
+        return isset($this->auth[$key]) ? $this->auth[$key] : null;
     }
 
 }

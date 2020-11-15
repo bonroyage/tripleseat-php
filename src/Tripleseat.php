@@ -48,6 +48,8 @@ use Tripleseat\Services;
  * @method Generator allLead(int $fromPage = 1, int $untilPage = PHP_INT_MAX)
  * @method Generator searchLead(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX)
  * @method getLead(int $id)
+ * @method createLead(array $lead, array $additionalData = [])
+ * @method Generator formsLead()
  *
  * @method Generator allLocation()
  *
@@ -59,14 +61,19 @@ use Tripleseat\Services;
  */
 class Tripleseat
 {
-
     /**
      * @var HttpClient
      */
     private $http;
 
+    /**
+     * @var array
+     */
     private $services = [];
 
+    /**
+     * @var string[]
+     */
     private $availableServices = [
         'account' => Services\Account::class,
         'booking' => Services\Booking::class,
@@ -84,8 +91,8 @@ class Tripleseat
             throw new InvalidAuthConfiguration("Missing 'api_key' from auth argument");
         }
 
-        if (!isset($auth['api_secret'])) {
-            throw new InvalidAuthConfiguration("Missing 'api_secret' from auth argument");
+        if (!isset($auth['secret_key'])) {
+            throw new InvalidAuthConfiguration("Missing 'secret_key' from auth argument");
         }
 
         if (!isset($auth['public_key'])) {
@@ -103,8 +110,8 @@ class Tripleseat
     public function __get(string $name)
     {
         if (array_key_exists($name, $this->availableServices)) {
-            $serviceClass = $this->availableServices[$name];
             if (!array_key_exists($name, $this->services)) {
+                $serviceClass = $this->availableServices[$name];
                 $this->services[$name] = new $serviceClass($this->http);
             }
 
@@ -123,7 +130,7 @@ class Tripleseat
     public function __call($name, $arguments)
     {
         if ([$service, $method] = $this->extractServiceAndMethod($name)) {
-            $service = $this->{$service};
+            $service = $this->__get($service);
 
             if (!empty($method)) {
                 return call_user_func_array([$service, $method], $arguments);
@@ -154,5 +161,4 @@ class Tripleseat
 
         return null;
     }
-
 }

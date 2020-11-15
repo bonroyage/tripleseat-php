@@ -10,6 +10,7 @@ use Tripleseat\Operations;
 class Contact extends Service
 {
     public const PATH = "contacts";
+    public const OBJECT_KEY = "contact";
 
     use Operations\AllPaged;
     use Operations\SearchPaged;
@@ -17,13 +18,4 @@ class Contact extends Service
     use Operations\Create;
     use Operations\Update;
     use Operations\Delete;
-
-    protected function parsePayload(array $data): array
-    {
-        if (array_key_exists('contact', $data)) {
-            return $data;
-        }
-
-        return ['contact' => $data];
-    }
 }

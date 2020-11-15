@@ -14,6 +14,7 @@ use Tripleseat\Operations;
 class Event extends Service
 {
     public const PATH = "events";
+    public const OBJECT_KEY = "event";
 
     use Operations\AllPaged;
     use Operations\SearchPaged;
@@ -21,13 +22,4 @@ class Event extends Service
     use Operations\Create;
     use Operations\Update;
     use Operations\Delete;
-
-    protected function parsePayload(array $data): array
-    {
-        if (array_key_exists('event', $data)) {
-            return $data;
-        }
-
-        return ['event' => $data];
-    }
 }

@@ -10,6 +10,7 @@ use Tripleseat\Operations;
 class User extends Service
 {
     public const PATH = "users";
+    public const OBJECT_KEY = "user";
 
     use Operations\AllPaged;
     use Operations\SearchPaged;

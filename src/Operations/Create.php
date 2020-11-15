@@ -10,7 +10,7 @@ trait Create
 
     public function create(array $data)
     {
-        $data = $this->parsePayload($data);
+        $data = $this->objectToPayload($data);
 
         return $this->client->post(
             $this->path(),

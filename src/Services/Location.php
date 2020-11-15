@@ -12,12 +12,7 @@ use Tripleseat\Operations;
 class Location extends Service
 {
     public const PATH = "locations";
+    public const OBJECT_KEY = "location";
 
     use Operations\All;
-
-    protected function parseFromList(array $value)
-    {
-        return $value['location'];
-    }
-
 }

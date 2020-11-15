@@ -12,7 +12,7 @@ $tripleseat = new Tripleseat([
 ]);
 ```
 
-#### Services
+### Services
 
 The following services are supported
 
@@ -27,7 +27,7 @@ The following services are supported
 | Site     | [Tripleseat documentation](https://support.tripleseat.com/hc/en-us/articles/212912147-Sites-API) | [Schema](http://api.tripleseat.com/v1/site_schema.json) |
 | User     | [Tripleseat documentation](https://support.tripleseat.com/hc/en-us/articles/212567567-Users-API) | [Schema](http://api.tripleseat.com/v1/user_schema.json) |
 
-#### Calling operations
+### Calling operations
 
 ```php
 // Option 1: $tripleseat->[service]->[operation]()
@@ -41,17 +41,17 @@ $tripleseat->allBooking();
 $tripleseat->findUser(1);
 ```
 
-#### `all` and `search` operations
+### `all` and `search` operations
 When querying one of the `all` or `search` endpoints, the client will return a Generator that you can iterate through. These endpoints are paged and return 50 results per page. The client will check the `total_pages` property in the first response and make sure every page gets loaded. The next page will only get loaded once the iterator gets to that point.
 
-Call `iterator_to_array` to convert the Generator to an array and load all pages immediately.
+Call [`iterator_to_array` (?)](https://www.php.net/manual/en/function.iterator-to-array.php) to convert the Generator to an array and load all pages immediately.
 
 Additionally, you may provide a `$firstPage` or `$untilPage` on these endpoints to change from which page on and/or until which page the data should be loaded (provided it's less than the total number of pages). 
 
 Note: The `site` and `location` services are not paged and do not feature the `$firstPage` or `$untilPage` arguments.
 
 ```php
-$bookings = $tripleseat->searchBooking([
+$bookings = $tripleseat->booking->search([
     'query' => 'Birthday',
     'order' => 'created_by'
 ]);
@@ -64,21 +64,56 @@ foreach($bookings as $booking) {
 $bookingsArray = iterator_to_array($bookings);
 ```
 
-#### Other operations
+### Other operations
 
-| Service | `find(id)` | `create(payload)` | `update(id, payload)` | `delete(id)` |
+| Service | `get(id)` | `create(payload)` | `update(id, payload)` | `delete(id)` |
 | ------- | :---------: | :---------------: | :-------------------: | :----------: |
 | Account  | ✅ | ✅ | ✅ | ✅ |
 | Booking  | ✅ | ✅ | ✅ | ✅ |
 | Contact  | ✅ | ✅ | ✅ | ✅ |
 | Event    | ✅ | ✅ | ✅ | ✅ |
-| Lead     | ✅ | ⌛︎ (1) | ❌ | ❌ |
+| Lead     | ✅ | ✅ [(?)](https://support.tripleseat.com/hc/en-us/articles/205161948-Lead-Form-API-endpoint) | ❌ | ✅ |
 | Location | ❌ | ❌ | ❌ | ❌ |
 | Site     | ❌ | ❌ | ❌ | ❌ |
 | User     | ✅ | ❌ | ❌ | ❌ |
 
-1. The create operation for leads isn't implemented yet.
+```php
+$user = $tripleseat->user->find(1);
+
+$tripleseat->lead->create(
+    [
+        'first_name' => 'john',
+        'last_name' => 'doe',
+        'email_address' => 'johndoe@example.com',
+        'phone_number' => '123-123-1234',
+        'company' => 'Example Inc.',
+        'event_description' => 'the event desc',
+        'event_date' => '11/19/2020',
+        'start_time' => '3pm',
+        'end_time' => '5pm',
+        'guest_count' => '50',
+        'additional_information' => 'some more info',
+        'location_id' => '1',
+    ],
+    // The following properties are all optional
+    [ 
+        'validate_only' => 'true',
+        'simple_error_messages' => 'true',
+    ]
+);
+
+$leadForms = $tripleseat->lead->forms();
+```
+
+### Exceptions
+All exceptions thrown by this library implement the `Tripleseat\Exceptions\TripleseatException` interface.
+
+### HTTP Client Compatibilities
+
+You could use any [PSR-18](https://www.php-fig.org/psr/psr-18/) compatible client to use with this library. No additional configurations are required. A list of compatible HTTP clients and client adapters can be found at [php-http.org](http://docs.php-http.org/en/latest/clients.html).
+
 
 ```php
-$user = $tripleseat->findUser(1);
+$httpClient = // some class implementing Psr\Http\Client\ClientInterface
+$tripleseat = new Tripleseat($auth, $httpClient);
 ```

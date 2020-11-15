@@ -1,5 +1,6 @@
 <?php namespace Tripleseat\Operations;
 
+use Generator;
 use Tripleseat\Services\Service;
 
 /**
@@ -8,7 +9,7 @@ use Tripleseat\Services\Service;
 trait SearchPaged
 {
 
-    public function search(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX): \Generator
+    public function search(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX): Generator
     {
         return $this->client->getPaged($this->path('search'), $parameters, $fromPage, $untilPage);
     }

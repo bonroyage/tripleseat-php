@@ -32,9 +32,9 @@ abstract class Service
         return $data;
     }
 
-    protected function payloadToObject(array $data)
+    protected function payloadToObject($data)
     {
-        if (defined('static::OBJECT_KEY') && array_key_exists(static::OBJECT_KEY, $data)) {
+        if (defined('static::OBJECT_KEY') && is_array($data) && array_key_exists(static::OBJECT_KEY, $data)) {
             return $data[static::OBJECT_KEY];
         }
 

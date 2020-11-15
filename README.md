@@ -1,5 +1,9 @@
 # PHP wrapper for Tripleseat API
 
+A simple PHP wrapper around [Tripleseat's API](https://support.tripleseat.com/hc/en-us/sections/200821727-Tripleseat-API).
+
+### Getting started
+
 First, create a new instance of the Tripleseat client and provide the API keys for authentication.
 
 ```php
@@ -11,6 +15,14 @@ $tripleseat = new Tripleseat([
     'public_key' => ''
 ]);
 ```
+
+#### API keys
+
+You'll need to attain your Tripleseat account's API keys. These can be found by logging in to your Tripleseat account and going to Settings -> Tripleseat API.
+
+There is a public and secret key that is used for the majority of the API calls. These values are configured as the `api_key` and `secret_key` respectively.
+
+A second public key is shown separately and is used for some lead operations. This is configured as `public_key`.
 
 ### Services
 

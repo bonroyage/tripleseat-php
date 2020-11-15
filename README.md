@@ -45,12 +45,12 @@ The following services are supported
 // Option 1: $tripleseat->[service]->[operation]()
 
 $tripleseat->booking->all();
-$tripleseat->user->find(1);
+$tripleseat->user->get(1);
 
 // Option 2: $tripleseat->[operation][Service]()
 
 $tripleseat->allBooking();
-$tripleseat->findUser(1);
+$tripleseat->getUser(1);
 ```
 
 ### `all` and `search` operations
@@ -90,7 +90,7 @@ $bookingsArray = iterator_to_array($bookings);
 | User     | ✅ | ❌ | ❌ | ❌ |
 
 ```php
-$user = $tripleseat->user->find(1);
+$user = $tripleseat->user->get(1);
 
 $tripleseat->lead->create(
     [

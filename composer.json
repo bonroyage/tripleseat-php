@@ -1,0 +1,29 @@
+{
+  "name": "bonroyage/tripleseat",
+  "description": "Tripleseat API interface",
+  "license": "MIT",
+  "type": "project",
+  "require": {
+    "php": ">=7.1",
+    "ext-json": "*",
+    "php-http/client-implementation": "^1.0",
+    "psr/http-message": "^1.0",
+    "php-http/httplug": "^1.0|^2.0",
+    "php-http/message-factory": "^1.0",
+    "php-http/discovery": "^1.0",
+    "api-clients/psr7-oauth1": "^2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.5",
+    "guzzlehttp/psr7": "^1.6",
+    "guzzlehttp/guzzle": "~6.0",
+    "php-http/guzzle6-adapter": "^2.0",
+    "http-interop/http-factory-guzzle": "^1.0",
+    "symfony/var-dumper" : "5.2.x-dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tripleseat\\": "src"
+    }
+  }
+}

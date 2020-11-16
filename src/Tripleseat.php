@@ -1,6 +1,5 @@
 <?php namespace Tripleseat;
 
-use Generator;
 use Psr\Http\Client\ClientInterface;
 use Tripleseat\Exceptions\InvalidArgumentException;
 use Tripleseat\Exceptions\InvalidAuthConfiguration;
@@ -18,48 +17,6 @@ use Tripleseat\Services;
  * @property Services\Location location
  * @property Services\Site site
  * @property Services\User user
- *
- * @method Generator allAccount(int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method Generator searchAccount(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method getAccount(int $id)
- * @method createAccount(array $account)
- * @method updateAccount(int $id, array $account)
- * @method deleteAccount(int $id)
- *
- * @method Generator allBooking(int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method Generator searchBooking(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method getBooking(int $id)
- * @method createBooking(array $booking)
- * @method updateBooking(int $id, array $booking)
- * @method deleteBooking(int $id)
- *
- * @method Generator allContact(int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method Generator searchContact(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method getContact(int $id)
- * @method createContact(array $contact)
- * @method updateContact(int $id, array $contact)
- * @method deleteContact(int $id)
- *
- * @method Generator allEvent(int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method Generator searchEvent(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method getEvent(int $id)
- * @method createEvent(array $event)
- * @method updateEvent(int $id, array $event)
- * @method deleteEvent(int $id)
- *
- * @method Generator allLead(int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method Generator searchLead(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method getLead(int $id)
- * @method createLead(array $lead, array $additionalData = [])
- * @method Generator formsLead()
- *
- * @method Generator allLocation()
- *
- * @method Generator allSite()
- *
- * @method Generator allUser(int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method Generator searchUser(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX)
- * @method getUser(int $id)
  */
 class Tripleseat implements \ArrayAccess
 {
@@ -141,48 +98,12 @@ class Tripleseat implements \ArrayAccess
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     * @return mixed
-     * @throws InvalidService
+     * @param int $offset
+     * @return bool
      */
-    public function __call($name, $arguments)
+    public function offsetExists($offset)
     {
-        if ([$service, $method] = $this->extractServiceAndMethod($name)) {
-            $service = $this->__get($service);
-
-            if (!empty($method)) {
-                return call_user_func_array([$service, $method], $arguments);
-            }
-        }
-
-        throw new InvalidService($name);
-    }
-
-    /**
-     * Parses a string to check if the last part matches any of the defined
-     * services and returns an array with the service and the string in front
-     * of the service as the method name.
-     *
-     * @param string $haystack
-     * @return array|null
-     */
-    private function extractServiceAndMethod(string $haystack)
-    {
-        $haystack = strtolower($haystack);
-        $needles = array_keys($this->availableServices);
-
-        foreach ($needles as $needle) {
-            if ($needle !== '' && substr_compare($haystack, (string)$needle, -strlen($needle), null, true) === 0) {
-                return [strtolower($needle), strstr($haystack, (string)$needle, true)];
-            }
-        }
-
-        return null;
-    }
-
-    private function sites()
-    {
+        // Load and cache the sites
         if (is_null($this->sites)) {
             $this->sites = [];
 
@@ -191,20 +112,11 @@ class Tripleseat implements \ArrayAccess
             }
         }
 
-        return $this->sites;
+        return array_key_exists($offset, $this->sites);
     }
 
     /**
-     * @param mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return array_key_exists($offset, $this->sites());
-    }
-
-    /**
-     * @param mixed $offset
+     * @param int $offset
      * @return Tripleseat
      * @throws InvalidSite
      */

@@ -47,20 +47,6 @@ The following services are supported
 | Site     | [Tripleseat documentation](https://support.tripleseat.com/hc/en-us/articles/212912147-Sites-API) | [Schema](http://api.tripleseat.com/v1/site_schema.json) |
 | User     | [Tripleseat documentation](https://support.tripleseat.com/hc/en-us/articles/212567567-Users-API) | [Schema](http://api.tripleseat.com/v1/user_schema.json) |
 
-### Calling operations
-
-```php
-// Option 1: $tripleseat->[service]->[operation]()
-
-$tripleseat->booking->all();
-$tripleseat->user->get(1);
-
-// Option 2: $tripleseat->[operation][Service]()
-
-$tripleseat->allBooking();
-$tripleseat->getUser(1);
-```
-
 ### Sites
 > A site represents a group of venues. Sites can have multiple locations.
 

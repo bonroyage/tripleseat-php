@@ -10,9 +10,11 @@ trait Delete
 
     public function delete(int $id)
     {
-        return $this->client->delete(
+        $response = $this->client->delete(
             $this->path($id)
         );
+
+        return $this->payloadToObject($response);
     }
 
 }

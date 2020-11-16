@@ -8,14 +8,16 @@ use Tripleseat\Services\Service;
 trait Create
 {
 
-    public function create(array $data, array $additionalData = [])
+    public function create(array $data)
     {
         $data = $this->objectToPayload($data);
 
-        return $this->client->post(
+        $response = $this->client->post(
             $this->path(),
             $data
         );
+
+        return $this->payloadToObject($response);
     }
 
 }

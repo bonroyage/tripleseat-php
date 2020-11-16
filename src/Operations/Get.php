@@ -10,11 +10,11 @@ trait Get
 
     public function get(int $id)
     {
-        return $this->payloadToObject(
-            $this->client->get(
-                $this->path($id)
-            )
+        $response = $this->client->get(
+            $this->path($id)
         );
+
+        return $this->payloadToObject($response);
     }
 
 }

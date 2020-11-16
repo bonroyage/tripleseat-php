@@ -2,8 +2,10 @@
 
 use Generator;
 use Psr\Http\Client\ClientInterface;
+use Tripleseat\Exceptions\InvalidArgumentException;
 use Tripleseat\Exceptions\InvalidAuthConfiguration;
 use Tripleseat\Exceptions\InvalidService;
+use Tripleseat\Exceptions\InvalidSite;
 use Tripleseat\Http\Client as HttpClient;
 use Tripleseat\Services;
 
@@ -59,7 +61,7 @@ use Tripleseat\Services;
  * @method Generator searchUser(array $parameters, int $fromPage = 1, int $untilPage = PHP_INT_MAX)
  * @method getUser(int $id)
  */
-class Tripleseat
+class Tripleseat implements \ArrayAccess
 {
     /**
      * @var HttpClient
@@ -85,6 +87,21 @@ class Tripleseat
         'user' => Services\User::class,
     ];
 
+    /**
+     * @var array
+     */
+    private $sites = null;
+
+    /**
+     * @var array
+     */
+    private $auth;
+
+    /**
+     * @var ClientInterface|null
+     */
+    private $httpClient;
+
     public function __construct(array $auth, ClientInterface $httpClient = null)
     {
         if (!isset($auth['api_key'])) {
@@ -99,6 +116,8 @@ class Tripleseat
             throw new InvalidAuthConfiguration("Missing 'public_key' from auth argument");
         }
 
+        $this->auth = $auth;
+        $this->httpClient = $httpClient;
         $this->http = new HttpClient($auth, $httpClient);
     }
 
@@ -160,5 +179,55 @@ class Tripleseat
         }
 
         return null;
+    }
+
+    private function sites()
+    {
+        if (is_null($this->sites)) {
+            $this->sites = [];
+
+            foreach ($this->site->all() as $site) {
+                $this->sites[$site['id']] = null;
+            }
+        }
+
+        return $this->sites;
+    }
+
+    /**
+     * @param mixed $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->sites());
+    }
+
+    /**
+     * @param mixed $offset
+     * @return Tripleseat
+     * @throws InvalidSite
+     */
+    public function offsetGet($offset)
+    {
+        if (isset($this[$offset])) {
+            if (is_null($this->sites[$offset])) {
+                $this->sites[$offset] = new self(array_merge($this->auth, ['site_id' => $offset]), $this->httpClient);
+            }
+
+            return $this->sites[$offset];
+        }
+
+        throw new InvalidSite("Site with ID '{$offset}' not found");
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        throw new InvalidArgumentException("Cannot set index");
+    }
+
+    public function offsetUnset($offset)
+    {
+        throw new InvalidArgumentException("Cannot unset index");
     }
 }

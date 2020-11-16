@@ -8,7 +8,7 @@ use Tripleseat\Services\Service;
 trait Create
 {
 
-    public function create(array $data)
+    public function create(array $data, array $additionalData = [])
     {
         $data = $this->objectToPayload($data);
 

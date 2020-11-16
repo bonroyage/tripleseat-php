@@ -127,6 +127,10 @@ class Client implements Http
      */
     public function createRequest(string $method, string $path, array $query = []): RequestInterface
     {
+        if (isset($this->auth['site_id'])) {
+            $query['site_id'] = $this->auth['site_id'];
+        }
+
         return $this->requestFactory->createRequest(
             $method,
             sprintf("%s%s%s", $this->baseUrl, $path, $this->buildQueryString($query))

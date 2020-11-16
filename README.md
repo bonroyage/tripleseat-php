@@ -2,9 +2,17 @@
 
 A simple PHP wrapper around [Tripleseat's API](https://support.tripleseat.com/hc/en-us/sections/200821727-Tripleseat-API).
 
+Requires at least PHP 7.1 
+
+Until v1 there may be backward incompatible changes with every minor version (0.x).
+
 ### Getting started
 
 First, create a new instance of the Tripleseat client and provide the API keys for authentication.
+
+```bash
+$ composer require bonroyage/tripleseat
+```
 
 ```php
 use Tripleseat\Tripleseat;
@@ -53,12 +61,51 @@ $tripleseat->allBooking();
 $tripleseat->getUser(1);
 ```
 
+### Sites
+> A site represents a group of venues. Sites can have multiple locations.
+
+You will most likely only need to retrieve or alter data for a single site, this is also enforced by Tripleseat. For example, you cannot create a contact that belongs to an account in a different site.
+
+An `InvalidSite` exception will be thrown if the site is not in the list of sites that your API keys give you access to.
+
+```php
+// Create a new client for Site with ID 1
+$mySite = $tripleseat[1];
+
+// Search accounts in this site
+$mySite->account->search(['query' => 'tripleseat']);
+
+// is the same as
+$tripleseat->account->search(['query' => 'tripleseat', 'site_id' => 1]);
+```
+
+#### What does it do in the background?
+
+When you call an offset on the Tripleseat class, it first checks that the site ID is returned by the sites endpoint and then created a new instance of the Tripleseat class with the `site_id` passed as additional property in the `$auth` array.
+
+Every request made with through this class will have `site_id` added to the query parameters of each request.
+
+```php
+$sites = $tripleseat->site->all();
+
+$mySite = new Tripleseat([
+    'api_key' => '',
+    'secret_key' => '',
+    'public_key' => '',
+    'site_id' => 1
+]);
+```
+
+#### What about endpoints that don't use site_id?
+
+Endpoints like `site`, `location`, and `user` don't support the `site_id` parameter. They will always return the same result regardless of what site ID is passed.
+
 ### `all` and `search` operations
 When querying one of the `all` or `search` endpoints, the client will return a Generator that you can iterate through. These endpoints are paged and return 50 results per page. The client will check the `total_pages` property in the first response and make sure every page gets loaded. The next page will only get loaded once the iterator gets to that point.
 
 Call [`iterator_to_array` (?)](https://www.php.net/manual/en/function.iterator-to-array.php) to convert the Generator to an array and load all pages immediately.
 
-Additionally, you may provide a `$firstPage` or `$untilPage` on these endpoints to change from which page on and/or until which page the data should be loaded (provided it's less than the total number of pages). 
+Additionally, you may provide a `$firstPage` or `$untilPage` on these operations to change from which page on and/or until which page the data should be loaded (provided it's less than the total number of pages). 
 
 Note: The `site` and `location` services are not paged and do not feature the `$firstPage` or `$untilPage` arguments.
 
@@ -92,29 +139,54 @@ $bookingsArray = iterator_to_array($bookings);
 ```php
 $user = $tripleseat->user->get(1);
 
-$tripleseat->lead->create(
-    [
-        'first_name' => 'john',
-        'last_name' => 'doe',
-        'email_address' => 'johndoe@example.com',
-        'phone_number' => '123-123-1234',
-        'company' => 'Example Inc.',
-        'event_description' => 'the event desc',
-        'event_date' => '11/19/2020',
-        'start_time' => '3pm',
-        'end_time' => '5pm',
-        'guest_count' => '50',
-        'additional_information' => 'some more info',
-        'location_id' => '1',
-    ],
-    // The following properties are all optional
-    [ 
-        'validate_only' => 'true',
-        'simple_error_messages' => 'true',
-    ]
-);
+$tripleseat->lead->create([
+    'first_name' => 'john',
+    'last_name' => 'doe',
+    'email_address' => 'johndoe@example.com',
+    'phone_number' => '123-123-1234',
+    'company' => 'Example Inc.',
+    'event_description' => 'the event desc',
+    'event_date' => '11/19/2020',
+    'start_time' => '3pm',
+    'end_time' => '5pm',
+    'guest_count' => '50',
+    'additional_information' => 'some more info',
+    'location_id' => '1',
+]);
 
 $leadForms = $tripleseat->lead->forms();
+```
+
+#### Create and update payloads
+Pass in the actual payload and the client will automatically wrap this with the correct key for the type. You can also provide an array with the payload already wrapped, this will not be wrapped again.
+
+```php
+// Calling ...
+$tripleseat->contact->create([
+    'account_id' => '',
+    'first_name' => 'John',
+    'last_name' => 'Doe',
+    'email_addresses' => [
+        [
+            'address' => 'johndoe@example.com'
+        ]
+    ]
+]);
+
+// will send the request as ...
+
+[
+    'contact' => [
+        'account_id' => '',
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'email_addresses' => [
+            [
+                'address' => 'johndoe@example.com'
+            ]
+        ]
+    ]
+]
 ```
 
 ### Exceptions

@@ -21,9 +21,9 @@ class Lead extends Service
     use Operations\Get;
     use Operations\Delete;
 
-    public function create(array $payload, array $additionalData = [])
+    public function create(array $payload)
     {
-        $payload = array_merge($additionalData, $this->objectToPayload($payload));
+        $payload = $this->objectToPayload($payload);
 
         $response = $this->client->post(
             'leads/create.js',

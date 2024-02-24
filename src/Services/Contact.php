@@ -1,4 +1,6 @@
-<?php namespace Tripleseat\Services;
+<?php
+
+namespace Tripleseat\Services;
 
 use Tripleseat\Operations;
 
@@ -9,13 +11,12 @@ use Tripleseat\Operations;
  */
 class Contact extends Service
 {
-    public const PATH = "contacts";
-    public const OBJECT_KEY = "contact";
+    public const PATH = 'contacts';
+    public const OBJECT_KEY = 'contact';
 
     use Operations\AllPaged;
-    use Operations\SearchPaged;
-    use Operations\Get;
     use Operations\Create;
-    use Operations\Update;
     use Operations\Delete;
+    use Operations\Get;
+    use Operations\Update;
 }

@@ -2,7 +2,7 @@
 
 A simple PHP wrapper around [Tripleseat's API](https://support.tripleseat.com/hc/en-us/sections/200821727-Tripleseat-API).
 
-Requires at least PHP 7.1 
+Requires at least PHP 8.2
 
 Until v1 there may be backward incompatible changes with every minor version (0.x).
 
@@ -59,10 +59,15 @@ An `InvalidSite` exception will be thrown if the site is not in the list of site
 $mySite = $tripleseat[1];
 
 // Search accounts in this site
-$mySite->account->search(['query' => 'tripleseat']);
+$mySite->account->search([
+    'query' => 'tripleseat'
+]);
 
 // is the same as
-$tripleseat->account->search(['query' => 'tripleseat', 'site_id' => 1]);
+$tripleseat->account->search([
+    'query' => 'tripleseat', 
+    'site_id' => 1
+]);
 ```
 
 #### What does it do in the background?
@@ -87,13 +92,18 @@ $mySite = new Tripleseat([
 Endpoints like `site`, `location`, and `user` don't support the `site_id` parameter. They will always return the same result regardless of what site ID is passed.
 
 ### `all` and `search` operations
-When querying one of the `all` or `search` endpoints, the client will return a Generator that you can iterate through. These endpoints are paged and return 50 results per page. The client will check the `total_pages` property in the first response and make sure every page gets loaded. The next page will only get loaded once the iterator gets to that point.
+When querying one of the `all` or `search` endpoints, the client will return a PaginatedResponse. These endpoints are paged and return 50 results per page.
 
-Call [`iterator_to_array` (?)](https://www.php.net/manual/en/function.iterator-to-array.php) to convert the Generator to an array and load all pages immediately.
+The PaginatedResponse class is iterable (over the results loaded in that page). It also features the following helpers:
+- `currentPage(): int` - gets the current page number
+- `totalPages(): int` - gets the total number of pages
+- `hasMore(): bool` - checks if the page number is below the total number of pages
+- `next(): ?PaginatedResponse` - get the next page (if applicable)
+- `results(): array` - get an array of this page's results
+- `all(): array` - load results from all pages into an array
+- `untilPage(int $page): array` - load results from current until given page into an array
 
-Additionally, you may provide a `$firstPage` or `$untilPage` on these operations to change from which page on and/or until which page the data should be loaded (provided it's less than the total number of pages). 
-
-Note: The `site` and `location` services are not paged and do not feature the `$firstPage` or `$untilPage` arguments.
+Note: The `site` and `location` services are not paged.
 
 ```php
 $bookings = $tripleseat->booking->search([
@@ -104,9 +114,6 @@ $bookings = $tripleseat->booking->search([
 foreach($bookings as $booking) {
     // do something with $booking
 }
-
-// convert from Generator to array
-$bookingsArray = iterator_to_array($bookings);
 ```
 
 ### Other operations

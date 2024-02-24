@@ -1,4 +1,6 @@
-<?php namespace Tripleseat\Services;
+<?php
+
+namespace Tripleseat\Services;
 
 use Tripleseat\Operations;
 
@@ -13,13 +15,12 @@ use Tripleseat\Operations;
  */
 class Event extends Service
 {
-    public const PATH = "events";
-    public const OBJECT_KEY = "event";
+    public const PATH = 'events';
+    public const OBJECT_KEY = 'event';
 
     use Operations\AllPaged;
-    use Operations\SearchPaged;
-    use Operations\Get;
     use Operations\Create;
-    use Operations\Update;
     use Operations\Delete;
+    use Operations\Get;
+    use Operations\Update;
 }

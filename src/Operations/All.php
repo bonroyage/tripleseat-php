@@ -1,6 +1,7 @@
-<?php namespace Tripleseat\Operations;
+<?php
 
-use Generator;
+namespace Tripleseat\Operations;
+
 use Tripleseat\Services\Service;
 
 /**
@@ -8,18 +9,13 @@ use Tripleseat\Services\Service;
  */
 trait All
 {
-
-    public function all(): Generator
+    public function all(array $query = []): array
     {
-        $data = $this->client->get($this->path());
+        $data = $this->client->get(
+            path: $this->path(),
+            query: $query
+        );
 
-        if (!is_iterable($data)) {
-            yield $data;
-        }
-
-        foreach ($data as $result) {
-            yield $this->payloadToObject($result);
-        }
+        return array_map($this->payloadToObject(...), $data);
     }
-
 }

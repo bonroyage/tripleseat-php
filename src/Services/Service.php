@@ -1,22 +1,19 @@
-<?php namespace Tripleseat\Services;
+<?php
+
+namespace Tripleseat\Services;
 
 use Tripleseat\Http\Client;
 
 abstract class Service
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    public function __construct(Client $client)
-    {
-        $this->client = $client;
+    public function __construct(
+        protected Client $client,
+    ) {
     }
 
-    protected function path(string $path = null)
+    protected function path(?string $path = null): string
     {
-        return static::PATH . ($path ? "/" . $path : "") . ".json";
+        return static::PATH . ($path ? '/' . $path : '') . '.json';
     }
 
     protected function objectToPayload(array $data): array
@@ -32,7 +29,7 @@ abstract class Service
         return $data;
     }
 
-    protected function payloadToObject($data)
+    protected function payloadToObject($data): array
     {
         if (defined('static::OBJECT_KEY') && is_array($data) && array_key_exists(static::OBJECT_KEY, $data)) {
             return $data[static::OBJECT_KEY];
@@ -40,5 +37,4 @@ abstract class Service
 
         return $data;
     }
-
 }

@@ -1,6 +1,8 @@
-<?php namespace Tripleseat\Operations;
+<?php
 
-use Generator;
+namespace Tripleseat\Operations;
+
+use Tripleseat\Http\PaginatedResponse;
 use Tripleseat\Services\Service;
 
 /**
@@ -8,10 +10,40 @@ use Tripleseat\Services\Service;
  */
 trait AllPaged
 {
-
-    public function all(int $fromPage = 1, int $untilPage = PHP_INT_MAX): Generator
+    public function all(int $page = 1): PaginatedResponse
     {
-        return $this->client->getPaged($this->path(), [], $fromPage, $untilPage);
+        $response = $this->client->get(
+            path: $this->path(),
+            query: [
+                'page' => $page,
+            ]
+        );
+
+        return new PaginatedResponse(
+            response: $response,
+            path: $this->path(),
+            query: [],
+            page: $page,
+            httpClient: $this->client,
+        );
     }
 
+    public function search(?array $query = [], int $page = 1): PaginatedResponse
+    {
+        $response = $this->client->get(
+            path: $this->path('search'),
+            query: [
+                ...$query,
+                'page' => $page,
+            ]
+        );
+
+        return new PaginatedResponse(
+            response: $response,
+            path: $this->path('search'),
+            query: $query,
+            page: $page,
+            httpClient: $this->client,
+        );
+    }
 }

@@ -1,10 +1,11 @@
-<?php namespace Tripleseat\Exceptions;
+<?php
+
+namespace Tripleseat\Exceptions;
 
 use Exception;
 
 class HttpException extends Exception implements TripleseatException
 {
-
     public $httpStatus = 0;
     public $httpMessage = null;
     public $httpBody = null;
@@ -29,7 +30,7 @@ class HttpException extends Exception implements TripleseatException
         return $this->httpBody;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $base = 'Tripleseat HttpException: Http Status: ' . $this->httpStatus;
 
@@ -39,5 +40,4 @@ class HttpException extends Exception implements TripleseatException
 
         return $base;
     }
-
 }

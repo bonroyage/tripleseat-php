@@ -1,4 +1,6 @@
-<?php namespace Tripleseat\Services;
+<?php
+
+namespace Tripleseat\Services;
 
 use Tripleseat\Operations;
 
@@ -11,8 +13,8 @@ use Tripleseat\Operations;
  */
 class Location extends Service
 {
-    public const PATH = "locations";
-    public const OBJECT_KEY = "location";
+    public const PATH = 'locations';
+    public const OBJECT_KEY = 'location';
 
     use Operations\All;
 }

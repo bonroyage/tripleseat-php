@@ -1,4 +1,6 @@
-<?php namespace Tripleseat\Operations;
+<?php
+
+namespace Tripleseat\Operations;
 
 use Tripleseat\Services\Service;
 
@@ -7,17 +9,15 @@ use Tripleseat\Services\Service;
  */
 trait Update
 {
-
-    public function update(int $id, array $data)
+    public function update(int $id, array $data): array
     {
         $data = $this->objectToPayload($data);
 
         $response = $this->client->put(
-            $this->path($id),
-            $data
+            path: $this->path($id),
+            body: $data
         );
 
         return $this->payloadToObject($response);
     }
-
 }

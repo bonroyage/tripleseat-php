@@ -1,4 +1,6 @@
-<?php namespace Tripleseat\Operations;
+<?php
+
+namespace Tripleseat\Operations;
 
 use Tripleseat\Services\Service;
 
@@ -7,17 +9,15 @@ use Tripleseat\Services\Service;
  */
 trait Create
 {
-
-    public function create(array $data)
+    public function create(array $data): array
     {
         $data = $this->objectToPayload($data);
 
         $response = $this->client->post(
-            $this->path(),
-            $data
+            path: $this->path(),
+            body: $data
         );
 
         return $this->payloadToObject($response);
     }
-
 }

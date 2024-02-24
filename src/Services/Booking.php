@@ -1,4 +1,6 @@
-<?php namespace Tripleseat\Services;
+<?php
+
+namespace Tripleseat\Services;
 
 use Tripleseat\Operations;
 
@@ -10,13 +12,12 @@ use Tripleseat\Operations;
  */
 class Booking extends Service
 {
-    public const PATH = "bookings";
-    public const OBJECT_KEY = "booking";
+    public const PATH = 'bookings';
+    public const OBJECT_KEY = 'booking';
 
     use Operations\AllPaged;
-    use Operations\SearchPaged;
-    use Operations\Get;
     use Operations\Create;
-    use Operations\Update;
     use Operations\Delete;
+    use Operations\Get;
+    use Operations\Update;
 }

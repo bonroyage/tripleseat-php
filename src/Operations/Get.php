@@ -1,4 +1,6 @@
-<?php namespace Tripleseat\Operations;
+<?php
+
+namespace Tripleseat\Operations;
 
 use Tripleseat\Services\Service;
 
@@ -7,14 +9,12 @@ use Tripleseat\Services\Service;
  */
 trait Get
 {
-
-    public function get(int $id)
+    public function get(int $id): array
     {
         $response = $this->client->get(
-            $this->path($id)
+            path: $this->path($id)
         );
 
         return $this->payloadToObject($response);
     }
-
 }

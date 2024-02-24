@@ -1,39 +1,33 @@
-<?php namespace Tripleseat;
+<?php
 
+namespace Tripleseat;
+
+use ArrayAccess;
 use Psr\Http\Client\ClientInterface;
 use Tripleseat\Exceptions\InvalidArgumentException;
 use Tripleseat\Exceptions\InvalidAuthConfiguration;
 use Tripleseat\Exceptions\InvalidService;
 use Tripleseat\Exceptions\InvalidSite;
 use Tripleseat\Http\Client as HttpClient;
-use Tripleseat\Services;
+use Tripleseat\Services\Service;
 
 /**
- * @property Services\Account account
- * @property Services\Booking booking
- * @property Services\Contact contact
- * @property Services\Event event
- * @property Services\Lead lead
- * @property Services\Location location
- * @property Services\Site site
- * @property Services\User user
+ * @property Services\Account $account
+ * @property Services\Booking $booking
+ * @property Services\Contact $contact
+ * @property Services\Event $event
+ * @property Services\Lead $lead
+ * @property Services\Location $location
+ * @property Services\Site $site
+ * @property Services\User $user
  */
-class Tripleseat implements \ArrayAccess
+class Tripleseat implements ArrayAccess
 {
-    /**
-     * @var HttpClient
-     */
-    private $http;
+    protected HttpClient $http;
 
-    /**
-     * @var array
-     */
-    private $services = [];
+    protected array $services = [];
 
-    /**
-     * @var string[]
-     */
-    private $availableServices = [
+    protected array $availableServices = [
         'account' => Services\Account::class,
         'booking' => Services\Booking::class,
         'contact' => Services\Contact::class,
@@ -44,23 +38,12 @@ class Tripleseat implements \ArrayAccess
         'user' => Services\User::class,
     ];
 
-    /**
-     * @var array
-     */
-    private $sites = null;
+    protected array $sites;
 
-    /**
-     * @var array
-     */
-    private $auth;
-
-    /**
-     * @var ClientInterface|null
-     */
-    private $httpClient;
-
-    public function __construct(array $auth, ClientInterface $httpClient = null)
-    {
+    public function __construct(
+        protected array $auth,
+        protected ?ClientInterface $httpClient = null,
+    ) {
         if (!isset($auth['api_key'])) {
             throw new InvalidAuthConfiguration("Missing 'api_key' from auth argument");
         }
@@ -73,38 +56,32 @@ class Tripleseat implements \ArrayAccess
             throw new InvalidAuthConfiguration("Missing 'public_key' from auth argument");
         }
 
-        $this->auth = $auth;
-        $this->httpClient = $httpClient;
-        $this->http = new HttpClient($auth, $httpClient);
+        $this->http = $this->newHttpClient();
     }
 
-    /**
-     * @param string $name
-     * @return Services\Service
-     * @throws InvalidService
-     */
-    public function __get(string $name)
+    protected function newHttpClient(): HttpClient
     {
-        if (array_key_exists($name, $this->availableServices)) {
-            if (!array_key_exists($name, $this->services)) {
-                $serviceClass = $this->availableServices[$name];
-                $this->services[$name] = new $serviceClass($this->http);
-            }
+        return new HttpClient(
+            auth: $this->auth,
+            httpClient: $this->httpClient
+        );
+    }
 
-            return $this->services[$name];
+    public function __get(string $name): Service
+    {
+        if (!isset($this->availableServices[$name])) {
+            throw new InvalidService($name);
         }
 
-        throw new InvalidService($name);
+        return $this->services[$name] ??= new $this->availableServices[$name](
+            client: $this->http,
+        );
     }
 
-    /**
-     * @param int $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         // Load and cache the sites
-        if (is_null($this->sites)) {
+        if (!isset($this->sites)) {
             $this->sites = [];
 
             foreach ($this->site->all() as $site) {
@@ -115,31 +92,28 @@ class Tripleseat implements \ArrayAccess
         return array_key_exists($offset, $this->sites);
     }
 
-    /**
-     * @param int $offset
-     * @return Tripleseat
-     * @throws InvalidSite
-     */
-    public function offsetGet($offset)
+    public function offsetGet($offset): Tripleseat
     {
-        if (isset($this[$offset])) {
-            if (is_null($this->sites[$offset])) {
-                $this->sites[$offset] = new self(array_merge($this->auth, ['site_id' => $offset]), $this->httpClient);
-            }
-
-            return $this->sites[$offset];
+        if (!isset($this[$offset])) {
+            throw new InvalidSite("Site with ID '{$offset}' not found");
         }
 
-        throw new InvalidSite("Site with ID '{$offset}' not found");
+        return $this->sites[$offset] ??= new self(
+            auth: [
+                ...$this->auth,
+                'site_id' => $offset,
+            ],
+            httpClient: $this->httpClient,
+        );
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
-        throw new InvalidArgumentException("Cannot set index");
+        throw new InvalidArgumentException('Cannot set index');
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
-        throw new InvalidArgumentException("Cannot unset index");
+        throw new InvalidArgumentException('Cannot unset index');
     }
 }

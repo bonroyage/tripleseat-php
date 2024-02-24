@@ -1,4 +1,6 @@
-<?php namespace Tripleseat\Services;
+<?php
+
+namespace Tripleseat\Services;
 
 use Tripleseat\Operations;
 
@@ -9,10 +11,9 @@ use Tripleseat\Operations;
  */
 class User extends Service
 {
-    public const PATH = "users";
-    public const OBJECT_KEY = "user";
+    public const PATH = 'users';
+    public const OBJECT_KEY = 'user';
 
     use Operations\AllPaged;
-    use Operations\SearchPaged;
     use Operations\Get;
 }

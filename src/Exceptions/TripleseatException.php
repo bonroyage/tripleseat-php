@@ -1,6 +1,7 @@
-<?php namespace Tripleseat\Exceptions;
+<?php
+
+namespace Tripleseat\Exceptions;
 
 interface TripleseatException
 {
-
 }

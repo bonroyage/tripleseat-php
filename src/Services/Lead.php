@@ -1,6 +1,7 @@
-<?php namespace Tripleseat\Services;
+<?php
 
-use Generator;
+namespace Tripleseat\Services;
+
 use Tripleseat\Exceptions\HttpException;
 use Tripleseat\Operations;
 
@@ -13,22 +14,23 @@ use Tripleseat\Operations;
  */
 class Lead extends Service
 {
-    public const PATH = "leads";
-    public const OBJECT_KEY = "lead";
+    public const PATH = 'leads';
+    public const OBJECT_KEY = 'lead';
 
     use Operations\AllPaged;
-    use Operations\SearchPaged;
-    use Operations\Get;
     use Operations\Delete;
+    use Operations\Get;
 
-    public function create(array $payload)
+    public function create(array $payload): array
     {
         $payload = $this->objectToPayload($payload);
 
         $response = $this->client->post(
             'leads/create.js',
             $payload,
-            ['public_key' => $this->client->getAuth('public_key')]
+            [
+                'public_key' => $this->client->publicKey(),
+            ]
         );
 
         if (isset($response['errors'])) {
@@ -38,19 +40,15 @@ class Lead extends Service
         return $response;
     }
 
-    public function forms(): Generator
+    public function forms(): array
     {
         $data = $this->client->get(
-            'lead_forms.json',
-            ['public_key' => $this->client->getAuth('public_key')]
+            path: 'lead_forms.json',
+            query: [
+                'public_key' => $this->client->publicKey(),
+            ]
         );
 
-        if (!is_iterable($data)) {
-            yield $data;
-        }
-
-        foreach ($data as $result) {
-            yield $result['lead_form'];
-        }
+        return array_column($data, 'lead_form');
     }
 }
